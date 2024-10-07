@@ -1,8 +1,9 @@
 import React from 'react'
-import { FolderOpenIcon } from '@heroicons/react/20/solid'
-const InputFile = ({label='Select File or browse'}) => {
-  const [files, setFiles] = React.useState([]);
-  console.log(files)
+import { DocumentCheckIcon, FolderOpenIcon } from '@heroicons/react/20/solid'
+import toReadableFileSize from '../utils/toReadableFileSize.js';
+const InputFile = ({ label = 'Select File or browse' }) => {
+  const [file, setFile] = React.useState();
+  console.log(file)
   return (
 
     <div className="max-w-xl text-slate-700 ">
@@ -16,19 +17,33 @@ const InputFile = ({label='Select File or browse'}) => {
           console.log('listillo')
 
           const files = e.dataTransfer.files;
-          setFiles(files);
+          setFile(files[0]);
 
         }}
         className="group flex justify-center drop-shadow-lg items-center w-full h-32 px-4 transition bg-slate-50 dark:bg-slate-800 dark:text-slate-300  border-2 border-slate-300 dark:border-slate-900 border-dashed rounded-md appearance-none cursor-pointer hover:border-green-600 focus:outline-none space-x-2"
       >
-        <FolderOpenIcon className='w-10 h-10 group-hover:text-green-600 drop-shadow-lg' />
-        <span className="font-normal">
-          {label}
-        </span>
+        {
+          file ? (
+            <>
+              <DocumentCheckIcon className='w-10 h-10 text-green-600 drop-shadow-lg' />
+              <span className="font-normal">
+                {file.name} {toReadableFileSize(file.size, true)}
+              </span>
+            </>
+          ) : (
+            <>
+              <FolderOpenIcon className='w-10 h-10 group-hover:text-green-600 drop-shadow-lg' />
+              <span className="font-normal">
+                {label}
+              </span>
+            </>
+          )
+        }
+
         <input
           onChange={e => {
             const files = e.target.files;
-            setFiles(files);
+            setFile(Array.from(files)[0]);
           }}
           max={1}
           accept=".bil,.hdr"
@@ -37,7 +52,7 @@ const InputFile = ({label='Select File or browse'}) => {
           className="hidden"
         />
       </label>
-    </div>
+    </div >
 
 
   )

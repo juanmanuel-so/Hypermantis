@@ -19,6 +19,8 @@ const createWindow = () => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     icon: './assets/hypermantis',
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 10, y: 10 }
   });
   Menu.setApplicationMenu(getMenu({
     app,
@@ -31,7 +33,7 @@ const createWindow = () => {
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools();
-  
+
 };
 
 

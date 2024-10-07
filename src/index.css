@@ -228,3 +228,11 @@
 body {
   font-family: 'MyFont', sans-serif;
 }
+
+#draggable-element {
+  -webkit-app-region: drag;
+}
+
+.not-draggable-element {
+  -webkit-app-region: no-drag;
+}
