@@ -229,7 +229,7 @@ body {
   font-family: 'MyFont', sans-serif;
 }
 
-#draggable-element {
+.draggable-element {
   -webkit-app-region: drag;
 }
 

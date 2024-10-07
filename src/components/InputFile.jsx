@@ -1,7 +1,7 @@
 import React from 'react'
 import { DocumentCheckIcon, FolderOpenIcon } from '@heroicons/react/20/solid'
 import toReadableFileSize from '../utils/toReadableFileSize.js';
-const InputFile = ({ label = 'Select File or browse' }) => {
+const InputFile = ({ label = 'Select, drop or browse file' }) => {
   const [file, setFile] = React.useState();
   console.log(file)
   return (
