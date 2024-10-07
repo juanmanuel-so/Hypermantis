@@ -12,9 +12,9 @@ const InputRadio = ({ className, id, name, value, onChange, options = defaultOpt
   const defaultName = useId()
   const componentName = id ?? defaultName
   return (
-    <div name={name}s className='flex flex-col space-y-1'>
+    <div name={name} className='flex flex-col space-y-1'>
       {options.map(option => (
-        <label className={'flex flex-row justify-start items-center space-x-1 font-light hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md ' + ' ' + className}>
+        <label key={option.id+option.name} className={'flex flex-row justify-start items-center space-x-1 font-light hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md ' + ' ' + className}>
           <div className='flex rounded-lg '>
             <input
               className='relative peer shrink-0 appearance-none w-5 h-5 rounded-full bg-slate-100 checked:bg-green-600 checked:border-emerald-600 border border-slate-400 drop-shadow-md focus:ring-1 ring-green-500'
