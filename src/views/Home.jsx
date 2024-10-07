@@ -6,7 +6,7 @@ import InputCheckBox from "../components/InputCheckBox.jsx";
 import InputRadio from "../components/InputRadio.jsx";
 const Home = () => {
   return (
-    <div className="text-slate-900 w-full h-full flex flex-col justify-center items-center space-y-4">
+    <div className="text-slate-900 dark:text-slate-100 w-full h-full flex flex-col justify-center items-center space-y-4">
       <div className="flex flex-row justify-start items-center space-x-4 p-2">
         <Logo className="w-10  h-10 " />
         <h1 className="w-fit font-normal text-3xl">Hypermantis</h1>
