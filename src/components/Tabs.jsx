@@ -25,7 +25,7 @@ const Tabs = () => {
   return (
     <div className='px-20 draggable-element'>
       <div
-        className="relative flex flex-row h-9 max-h-9 bg-slate-200 dark:bg-slate-700 text-sm font-light text-slate-600 dark:text-slate-200 overflow-x-scroll overflow-y-hidden"w
+        className="relative flex flex-row h-9 max-h-9 bg-slate-200 dark:bg-slate-800 text-sm font-light text-slate-600 dark:text-slate-200 overflow-x-scroll overflow-y-hidden"w
       >
         {
           [
