@@ -231,8 +231,19 @@ body {
 
 .draggable-element {
   -webkit-app-region: drag;
-}
+  
 
+}
+.remove-scrollbar::-webkit-scrollbar {
+ /* Para ocultar el scroll en navegadores WebKit */
+  display: none;
+  
+}
 .not-draggable-element {
+  pointer-events: auto;
   -webkit-app-region: no-drag;
+}
+.not-draggable-element.hidden {
+  pointer-events: none;
+  
 }
