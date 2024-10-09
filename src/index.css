@@ -225,9 +225,7 @@
   font-weight: 100;
   font-style: italic;
 }
-body {
-  font-family: 'MyFont', sans-serif;
-}
+
 
 .draggable-element {
   -webkit-app-region: drag;
@@ -240,10 +238,5 @@ body {
   
 }
 .not-draggable-element {
-  pointer-events: auto;
   -webkit-app-region: no-drag;
-}
-.not-draggable-element.hidden {
-  pointer-events: none;
-  
 }

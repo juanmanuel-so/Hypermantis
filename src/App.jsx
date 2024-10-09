@@ -12,14 +12,16 @@ export default function App() {
   useEffect( ()=>{ localStorage.setItem('theme', theme) },[theme])
   const {tabs, currentTab, currentTabId, setCurrentTabId, addTab, removeTab}  =useTabs()
   return (
-    <div className={"min-h-screen max-h-full bg-slate-50 dark:bg-slate-900 text-slate-900 font-myfont"+' '+(theme==='light'?'':'dark')}>
-      <Tabs
+    <div className={"relative w-full h-full bg-slate-50 dark:bg-slate-900 text-slate-900 font-myfont  flex flex-col overflow-hidden"+' '+(theme==='light'?'':'dark')}>
+
+        <Tabs
         onSelectTab={setCurrentTabId }
         onAddTab={addTab}
         onRemoveTab={removeTab}
         currentTab={currentTab}
         tabs={tabs}
       />
+
       <Home currentTabInformation={currentTab} className="font-bold "/>
     </div>
   );
