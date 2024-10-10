@@ -13,7 +13,7 @@ const Home = () => {
 
       <LogoText/>
       <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">
-        <p className="font-light ">Select a .bil file to view hyperspectral information</p>
+        <p className="font-light ">Select a .bip and a .hdr file to view hyperspectral information</p>
         <InputFile />
       </div>
       <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">

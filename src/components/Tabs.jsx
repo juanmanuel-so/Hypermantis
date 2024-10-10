@@ -9,10 +9,10 @@ const Tabs = ({ tabs, onAddTab, onRemoveTab, onSelectTab, currentTab }) => {
     "flex justify-center items-center w-fit h-full cursor-pointer border-b border-slate-200 bg-slate-100 not-draggable-element hover:bg-slate-200 hover:border hover:border-slate-300 dark:hover:border-slate-800 active:bg-slate-300 dark:bg-slate-950 dark:border-slate-800 dark:hover:bg-slate-700 dark:active:bg-slate-800 max-h-9 text-slate-600 dark:text-slate-400 hover:dark:text-slate-200"
 
   const [isHoveringWhiteSpace, setIsHoveringWhiteSpace] = useState(false)
-  const onMouseOver = () => setIsHoveringWhiteSpace(isHoveringWhiteSpace => !isHoveringWhiteSpace)
+  const onMouseOver = () => setIsHoveringWhiteSpace(!isHoveringWhiteSpace)
   return (
     <div
-      className={"flex h-9 max-h-9 bg-slate-200 dark:bg-slate-800 text-sm font-light text-slate-800 dark:text-slate-200"+' '+(isHoveringWhiteSpace?'flex-row-reversel':'flex-row')}
+      className={"flex h-9 max-h-9 bg-slate-200 dark:bg-slate-800 text-sm font-light text-slate-800 dark:text-slate-200"+' '+(isHoveringWhiteSpace?'flex-row-reverse':'flex-row')}
     >
       <div onMouseOver={onMouseOver} className={'z-50 max-w-20 min-w-20 draggable-element'}>
       </div>
