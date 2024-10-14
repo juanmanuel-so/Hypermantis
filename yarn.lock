@@ -4540,6 +4540,11 @@ locate-path@^7.1.0:
   dependencies:
     p-locate "^6.0.0"
 
+lodash.clonedeep@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz"
+  integrity sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==
+
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz"
@@ -5901,6 +5906,13 @@ schema-utils@^4.0.0:
     ajv "^8.9.0"
     ajv-formats "^2.1.1"
     ajv-keywords "^5.1.0"
+
+secure-electron-context-menu@^1.3.3:
+  version "1.3.3"
+  resolved "https://registry.npmjs.org/secure-electron-context-menu/-/secure-electron-context-menu-1.3.3.tgz"
+  integrity sha512-Q0YneA7OtdTtILYBRRl4+dB7ACUyyDGS552VBC7PeWWnPLdb1yezgzDrJPUbx42GKdIgUyjDiiXYu5sWmF71+g==
+  dependencies:
+    lodash.clonedeep "^4.5.0"
 
 select-hose@^2.0.0:
   version "2.0.0"

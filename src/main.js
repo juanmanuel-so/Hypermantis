@@ -1,8 +1,8 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, nativeImage } = require('electron');
 const path = require('node:path');
-const { Menu } = require('electron');
+const { Menu, ipcMain } = require('electron');
 const { default: getMenu } = require('./utils/getMenu');
-
+const ContextMenu = require("secure-electron-context-menu").default;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -16,11 +16,35 @@ const createWindow = () => {
     width: 1200,
     height: 800,
     webPreferences: {
+      //contextIsolation: true,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     icon: './assets/hypermantis',
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 10, y: 10 }
+  });
+  ContextMenu.mainBindings(ipcMain, mainWindow, Menu, false, {
+    "tab": [{
+      id: "close-tab",
+      label: "Close tab",
+
+    }],
+    "default": [{
+      role: "cut",
+      label: 'Cut',
+    },
+    {
+      role: "copy",
+      label: 'Copy',
+    },
+    {
+      role: "paste",
+      label: 'Paste',
+    },
+    {
+      role: "selectall",
+      label: 'Select All',
+    }]
   });
   Menu.setApplicationMenu(getMenu({
     app,

@@ -9,7 +9,7 @@ import InputTextArea from "../components/InputTextArea.jsx";
 import LogoText from "../components/LogoText.jsx";
 const Home = () => {
   return (
-    <div className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
+    <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
 
       <LogoText/>
       <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">
