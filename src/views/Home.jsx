@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Logo from "../assets/hypermantis.svg";
 import InputFile from "../components/InputFile.jsx";
 import Button from "../components/Button.jsx";
@@ -15,15 +15,15 @@ import ImageViewer from "../components/ImageViewer.jsx";
 import Spinner from "../components/Spinner.jsx";
 import LineChart from "../components/charts/LineChart.jsx";
 const Home = () => {
-  const [files, setFiles] = React.useState();
+  const [files, setFiles] = useState([]);
   const { data } = useQuery({
     queryFn: () => {
       const formData = new FormData();
       files.forEach((file) => formData.append('files', file));
       return axios.post("http://localhost:8000/process", formData);
     },
-    queryKey: ['process', files],
-    enabled: files !== undefined,
+    queryKey: ['process', ...files.map((file) => file.name)],
+    enabled: files != false,
     refetchOnWindowFocus:false
   })
   const imageQuery = useQuery({
@@ -32,44 +32,50 @@ const Home = () => {
     enabled: data?.status === 200,
     refetchOnWindowFocus:false
   })
-  console.log('iquery', imageQuery)
   const n = 25
   const image = imageQuery.data?.data?.data
   const [renderingImage, setRenderingImage] = useState(true)
   const [selectedPixel, setSelectedPixel] = useState(null)
   const selectedPixelQuery = useQuery({
     queryFn: () => axios.get('http://localhost:8000/get_pixel_info', { params: { transaction_name: data.data?.transaction_name, x: parseInt(selectedPixel.x), y: parseInt(selectedPixel.y) } }),
-    queryKey: ['selected_pixel', data?.data?.transaction_name, selectedPixel?.x, selectedPixel?.y, selectedPixel],
-    enabled: selectedPixel !== null
+    queryKey: ['selected_pixel', data?.data?.transaction_name, selectedPixel?.x, selectedPixel?.y],
+    enabled: selectedPixel !== null,
   })
-  let selectedPixelSeries = null
-  if(selectedPixelQuery.data){
-    selectedPixelSeries = [
-      {
-        label: 'Wavelength refraction index',
-        data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({wavelength: parseFloat(key), refractionIndex: parseFloat(value)}))
-      }
-    ]
-  }
-  console.log('series',selectedPixelSeries)
+  let selectedPixelSeries = useMemo(()=>{
+    if(selectedPixelQuery.data?.data){
+      return [
+        {
+          label: 'Wavelength refraction index',
+          data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({wavelength: parseFloat(key), refractionIndex: parseFloat(value)}))
+        }
+      ]
+    }
+
+    return null
+  },[selectedPixelQuery.isRefetching, selectedPixelQuery.isFetching])
+
   const getWavelength = item => item.wavelength
   const getRefractionIndex = item => item.refractionIndex
+  console.log('series', selectedPixelSeries)
+  console.log('selectedPixel', selectedPixel)
   return (
     <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
 
       <LogoText />
-      <div className="flex flex-col sm:flex-row h-fit w-full items-center sm:justify-center p-4">
-        <div className="h-fit space-y-1 font-poppins w-1/2 px-4">
+      <div className="flex flex-col sm:flex-row h-56  w-full items-center sm:justify-center p-4 shrink-0 ">
+        <div className="h-full space-y-1 font-poppins w-1/2 px-4 flex flex-col">
           <p className="font-light text-center w-full ">Select a .bip and a .hdr file to view hyperspectral information</p>
           <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} accept='.bip,.hdr,.bil' />
         </div>
         {
-          (selectedPixel && !console.log(selectedPixelQuery.data)&&selectedPixelQuery.data) && (
-            <LineChart series={selectedPixelSeries} getValueForPrimaryAxis={getWavelength} getValueForSecondaryAxis={getRefractionIndex}/>
+          (selectedPixel) && (
+            selectedPixelQuery.isLoading ? <div className="w-1/2 h-full flex items-center justify-center bg-white dark:bg-slate-950 rounded-md opacity-30"><Spinner className="w-16 h-16" /></div> : (
+              <LineChart series={selectedPixelSeries} getValueForPrimaryAxis={getWavelength} getValueForSecondaryAxis={getRefractionIndex}/>
+            )
           )
         }
       </div>
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center bg-white rounded-md drop-shadow-md dark:bg-slate-950 p-2">
         {
           data&&(
             (imageQuery.isLoading) ? <Spinner className="w-16 h-16" /> : (
@@ -78,7 +84,8 @@ const Home = () => {
           )
         }
       </div>
-      <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">
+      {/*
+        <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">
         <h2 className="font-light ">Components library</h2>
         <InputFile />
         <Button style="primary">primary</Button>
@@ -90,6 +97,7 @@ const Home = () => {
         <InputTextArea>Textarea me</InputTextArea>
         <Spinner />
       </div>
+      */}
     </div>
   )
 }

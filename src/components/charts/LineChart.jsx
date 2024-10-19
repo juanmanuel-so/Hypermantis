@@ -1,5 +1,5 @@
 
-import useDemoConfig from "./useDemoConfig.jsx";
+
 import React, { useContext } from "react";
 import { AxisOptions, Chart } from "react-charts";
 import AppContext from "../../contexts/AppContext.jsx";
@@ -22,7 +22,7 @@ export default function LineChart({series, getValueForPrimaryAxis, getValueForSe
     []
   );
   return (
-    <div className="flex w-1/2 h-52 bg-white dark:bg-slate-950 rounded-md drop-shadow-md p-1">
+    <div className="flex w-1/2 h-full bg-white dark:bg-slate-950 rounded-md drop-shadow-md p-1">
       <Chart
           options={{
             data:series,

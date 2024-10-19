@@ -3,15 +3,13 @@ import { DocumentCheckIcon, FolderOpenIcon } from '@heroicons/react/20/solid'
 import toReadableFileSize from '../utils/toReadableFileSize.js';
 const InputFile = ({ label = 'Select, drop or browse file' , max, onChangeFile = ()=>{}, accept}) => {
   const [file, setFile] = React.useState();
-  console.log(file)
   const onChangeFileCallback = useCallback(onChangeFile, [onChangeFile])
   useEffect(() => {
-    onChangeFileCallback(file)
+    file && onChangeFileCallback(file)
   }, [file])
   return (
 
-    <div className="w-full text-slate-700 ">
-      <label
+    <label
         onDragOver={(e) => {
           e.preventDefault();
 
@@ -24,7 +22,7 @@ const InputFile = ({ label = 'Select, drop or browse file' , max, onChangeFile =
           setFile(Array.from(files).slice(0,2));
 
         }}
-        className="group flex justify-center drop-shadow-lg items-center w-full h-32 px-4 transition bg-slate-50 dark:bg-slate-800 dark:text-slate-300  border-2 border-slate-300 dark:border-slate-900 border-dashed rounded-md appearance-none cursor-pointer hover:border-green-600 focus:outline-none space-x-2"
+        className="group flex justify-center drop-shadow-lg items-center w-full h-full px-4 transition bg-slate-50 dark:bg-slate-800 dark:text-slate-300  border-2 border-slate-300 dark:border-slate-900 border-dashed rounded-md appearance-none cursor-pointer hover:border-green-600 focus:outline-none space-x-2"
       >
         {
           file ? (
@@ -66,7 +64,6 @@ const InputFile = ({ label = 'Select, drop or browse file' , max, onChangeFile =
           className="hidden"
         />
       </label>
-    </div >
 
 
   )
