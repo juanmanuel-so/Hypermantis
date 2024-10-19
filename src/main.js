@@ -16,13 +16,17 @@ const createWindow = () => {
     width: 1200,
     height: 800,
     webPreferences: {
-      //contextIsolation: true,
+
+ // Asegúrate de que esté deshabilitado
+    
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     icon: './assets/hypermantis',
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 10, y: 10 }
   });
+
+
   ContextMenu.mainBindings(ipcMain, mainWindow, Menu, false, {
     "tab": [{
       id: "close-tab",
