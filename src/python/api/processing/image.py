@@ -11,6 +11,7 @@ class Image:
     def __init__(self, bip_data_path, bip_header_path):
         img = spy.open_image(bip_header_path)
         wavelengths = img.metadata.get('wavelength')
+        print('wavelengths of image:', wavelengths)
         self.img = img #img is an object, that have rows and samples (rows and cols of image), everyone with an array of values corresponding to bands
         self.bands = wavelengths #Bands is an array of numbers, this numbers represent the bandwith of each band (nm of wavelength).
         self.metadata = img.metadata
@@ -27,6 +28,7 @@ class Image:
     
     def get_rgb_composition(self, bands_selected=rgb_wavelengths):
         positions = [find_closest(self.bands, num) for num in bands_selected]
+        print('available wavelength vy positions:', [self.bands[positions[0]], self.bands[positions[1]], self.bands[positions[2]]])
         rgb_image = spy.get_rgb(self.img, positions)
         return rgb_image
     

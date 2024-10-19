@@ -23,12 +23,13 @@ const Home = () => {
     },
     queryKey: ['process', files],
     enabled: files !== undefined,
-
+    refetchOnWindowFocus:false
   })
   const imageQuery = useQuery({
     queryFn: () => axios.get('http://localhost:8000/as_image', { params: { transaction_name: data.data?.transaction_name } }),
     queryKey: ['image', data?.data?.transaction_name],
-    enabled: data?.status === 200
+    enabled: data?.status === 200,
+    refetchOnWindowFocus:false
   })
   console.log('iquery', imageQuery)
   const n = 25
@@ -47,7 +48,7 @@ const Home = () => {
       <div className="flex flex-col sm:flex-row h-fit w-full items-center sm:justify-center p-4">
         <div className="h-fit space-y-1 font-poppins w-1/2 px-4">
           <p className="font-light text-center w-full ">Select a .bip and a .hdr file to view hyperspectral information</p>
-          <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} />
+          <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} accept='.bip,.hdr,.bil' />
         </div>
         {
           selectedPixel && (
@@ -60,8 +61,10 @@ const Home = () => {
       </div>
       <div className="flex flex-col justify-center items-center">
         {
-          (imageQuery.isLoading) ? <Spinner className="w-16 h-16" /> : (
-            <ImageViewer data={data} image={image} onRenderingStateChange={val => setRenderingImage(val)} onChangeSelectedPixel={newVal => setSelectedPixel(newVal)} />
+          data&&(
+            (imageQuery.isLoading) ? <Spinner className="w-16 h-16" /> : (
+              <ImageViewer data={data} image={image} onRenderingStateChange={val => setRenderingImage(val)} onChangeSelectedPixel={newVal => setSelectedPixel(newVal)} />
+            )
           )
         }
       </div>

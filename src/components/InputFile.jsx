@@ -60,7 +60,7 @@ const InputFile = ({ label = 'Select, drop or browse file' , max, onChangeFile =
           }}
           multiple
           max={max}
-          accept=".bip,.hdr"
+          accept={accept}
           type="file"
           name="file_upload"
           className="hidden"
