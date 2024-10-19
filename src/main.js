@@ -3,13 +3,15 @@ const path = require('node:path');
 const { Menu, ipcMain } = require('electron');
 const { default: getMenu } = require('./utils/getMenu');
 const ContextMenu = require("secure-electron-context-menu").default;
+const fs = require('fs'); 
+const os = require('os');
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
 const isMac = process.platform === 'darwin'
 
-
+const tempDir = path.join(os.tmpdir(), 'hypermantis');
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -17,8 +19,8 @@ const createWindow = () => {
     height: 800,
     webPreferences: {
 
- // Asegúrate de que esté deshabilitado
-    
+      // Asegúrate de que esté deshabilitado
+
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
     icon: './assets/hypermantis',
@@ -80,6 +82,25 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
+  app.on('will-quit', () => {
+    const files = fs.readdirSync(tempDir);
+
+    // Borrar cada archivo o carpeta dentro del directorio
+    for (const file of files) {
+      const filePath = path.join(tempDir, file);
+
+      // Verificar si es un directorio o archivo
+      const stats = fs.statSync(filePath);
+
+      if (stats.isDirectory()) {
+        // Si es un directorio, borrarlo recursivamente
+        fs.rmSync(filePath, { recursive: true, force: true });
+      } else {
+        // Si es un archivo, borrarlo
+        fs.unlinkSync(filePath);
+      }
+    }
+  })
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

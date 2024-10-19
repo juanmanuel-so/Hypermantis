@@ -12,7 +12,11 @@ import json
 from processing.decode import decode
 import os
 app = FastAPI()
-temp_dir = "./temp/"
+import tempfile
+
+# Obtener la ruta de la carpeta temporal
+temp_dir = os.path.join(tempfile.gettempdir(), 'hypermantis')
+print(f"La carpeta temporal del sistema es: {temp_dir}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Permitir todos los orígenes

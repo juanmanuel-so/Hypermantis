@@ -11,7 +11,7 @@ class Image:
     def __init__(self, bip_data_path, bip_header_path):
         img = spy.open_image(bip_header_path)
         wavelengths = img.metadata.get('wavelength')
-        print('wavelengths of image:', wavelengths)
+        #('wavelengths of image:', wavelengths)
         self.img = img #img is an object, that have rows and samples (rows and cols of image), everyone with an array of values corresponding to bands
         self.bands = wavelengths #Bands is an array of numbers, this numbers represent the bandwith of each band (nm of wavelength).
         self.metadata = img.metadata
