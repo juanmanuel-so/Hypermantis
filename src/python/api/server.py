@@ -64,7 +64,7 @@ async def get_pixel_info(transaction_name: str, x: int, y: int):
     header_filename = os.path.join(temp_dir, transaction_name+'.bip.hdr')
     image = decode(data_filename, header_filename)
     pixel = image.img[y,x]
-    return {'message': 'pixel info', 'pixel': pixel.tolist()}
+    return {'message': 'pixel info', 'pixel': zip(image.bands, pixel.tolist())}
 
 if __name__ == "__main__":
     import uvicorn

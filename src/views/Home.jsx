@@ -13,6 +13,7 @@ import { sendFilesToProcessing } from "../queries/processing.js";
 import useWebSocket from "react-use-websocket";
 import ImageViewer from "../components/ImageViewer.jsx";
 import Spinner from "../components/Spinner.jsx";
+import LineChart from "../components/charts/LineChart.jsx";
 const Home = () => {
   const [files, setFiles] = React.useState();
   const { data } = useQuery({
@@ -41,6 +42,18 @@ const Home = () => {
     queryKey: ['selected_pixel', data?.data?.transaction_name, selectedPixel?.x, selectedPixel?.y, selectedPixel],
     enabled: selectedPixel !== null
   })
+  let selectedPixelSeries = null
+  if(selectedPixelQuery.data){
+    selectedPixelSeries = [
+      {
+        label: 'Wavelength refraction index',
+        data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({wavelength: parseFloat(key), refractionIndex: parseFloat(value)}))
+      }
+    ]
+  }
+  console.log('series',selectedPixelSeries)
+  const getWavelength = item => item.wavelength
+  const getRefractionIndex = item => item.refractionIndex
   return (
     <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
 
@@ -51,11 +64,8 @@ const Home = () => {
           <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} accept='.bip,.hdr,.bil' />
         </div>
         {
-          selectedPixel && (
-            <div className="flex flex-col w-fit h-fit space-y-1">
-              <h2 className="font-light ">Selected pixel</h2>
-              <p className="font-light">Row: {selectedPixel.row}</p>
-            </div>
+          (selectedPixel && !console.log(selectedPixelQuery.data)&&selectedPixelQuery.data) && (
+            <LineChart series={selectedPixelSeries} getValueForPrimaryAxis={getWavelength} getValueForSecondaryAxis={getRefractionIndex}/>
           )
         }
       </div>
