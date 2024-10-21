@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import StepButtons from './StepButtons.jsx';
 
-const ImageViewer = ({image, data, onRenderingStateChange=()=>{}, onChangeSelectedPixel=()=>{}}) => {
+const ImageViewer = ({ image, data, onRenderingStateChange = () => { }, onChangeSelectedPixel = () => { } }) => {
   const canvasRef = useRef(null);
   const [selectedPixel, setSelectedPixel] = useState(null);
 
-    
+
   useEffect(() => {
     if (image) {
       const canvas = canvasRef.current;
@@ -32,7 +33,7 @@ const ImageViewer = ({image, data, onRenderingStateChange=()=>{}, onChangeSelect
       onRenderingStateChange(false)
     }
   }, [data?.status, image]);
-
+  const [scale, setScale] = useState(1)
   // Maneja el clic en el canvas
   const handleCanvasClick = (event) => {
     const canvas = canvasRef.current;
@@ -48,16 +49,16 @@ const ImageViewer = ({image, data, onRenderingStateChange=()=>{}, onChangeSelect
   const onChangeSelectedPixelCallback = useCallback(onChangeSelectedPixel, [onChangeSelectedPixel])
   useEffect(() => {
     onChangeSelectedPixelCallback(selectedPixel)
-  },[selectedPixel])
+  }, [selectedPixel])
   return (
     <>
-      <canvas ref={canvasRef} onClick={handleCanvasClick} style={{ border: '1px solid black' }} />
-        {selectedPixel && (
-          <div>
-            <p>Pixel seleccionado: ({selectedPixel.x}, {selectedPixel.y})</p>
-            <p>Color: {selectedPixel.color}</p>
-          </div>
-        )}
+      <div>
+        <canvas ref={canvasRef} onClick={handleCanvasClick} />
+      </div>
+      <div className='w-fit flex flex-row justify-center items-center space-x-1 mt-1 '>
+        <StepButtons onMinus={() => { }}>Scale: </StepButtons>
+      </div>
+
     </>
   )
 }

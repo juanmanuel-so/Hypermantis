@@ -14,6 +14,7 @@ import useWebSocket from "react-use-websocket";
 import ImageViewer from "../components/ImageViewer.jsx";
 import Spinner from "../components/Spinner.jsx";
 import LineChart from "../components/charts/LineChart.jsx";
+import StepButtons from "../components/StepButtons.jsx";
 const Home = () => {
   const [files, setFiles] = useState([]);
   const { data } = useQuery({
@@ -40,14 +41,16 @@ const Home = () => {
     queryFn: () => axios.get('http://localhost:8000/get_pixel_info', { params: { transaction_name: data.data?.transaction_name, x: parseInt(selectedPixel.x), y: parseInt(selectedPixel.y) } }),
     queryKey: ['selected_pixel', data?.data?.transaction_name, selectedPixel?.x, selectedPixel?.y],
     enabled: selectedPixel !== null,
+    placeholderData: (lastData) => lastData,
   })
+  console.log('selectedPi ', selectedPixelQuery)
   let selectedPixelSeries = useMemo(()=>{
     if(selectedPixelQuery.data?.data){
       return [
         {
           label: 'Wavelength refraction index',
-          data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({wavelength: parseFloat(key), refractionIndex: parseFloat(value)}))
-        }
+          data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({wavelength: parseFloat(key), refractionIndex: value}))
+        },
       ]
     }
 
@@ -68,8 +71,8 @@ const Home = () => {
           <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} accept='.bip,.hdr,.bil' />
         </div>
         {
-          (selectedPixel) && (
-            selectedPixelQuery.isLoading ? <div className="w-1/2 h-full flex items-center justify-center bg-white dark:bg-slate-950 rounded-md opacity-30"><Spinner className="w-16 h-16" /></div> : (
+          (selectedPixel && selectedPixelSeries) && (
+             (
               <LineChart series={selectedPixelSeries} getValueForPrimaryAxis={getWavelength} getValueForSecondaryAxis={getRefractionIndex}/>
             )
           )
@@ -84,7 +87,7 @@ const Home = () => {
           )
         }
       </div>
-      {/*
+      
         <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">
         <h2 className="font-light ">Components library</h2>
         <InputFile />
@@ -96,8 +99,9 @@ const Home = () => {
         <InputText>Text me</InputText>
         <InputTextArea>Textarea me</InputTextArea>
         <Spinner />
+        <StepButtons />
       </div>
-      */}
+      
     </div>
   )
 }
