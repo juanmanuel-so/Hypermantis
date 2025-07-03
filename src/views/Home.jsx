@@ -7,7 +7,7 @@ import InputRadio from "../components/InputRadio.jsx";
 import InputText from "../components/InputText.jsx";
 import InputTextArea from "../components/InputTextArea.jsx";
 import LogoText from "../components/LogoText.jsx";
-import { useQuery, QueryClient } from "@tanstack/react-query";
+import { useQuery, QueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { sendFilesToProcessing } from "../queries/processing.js";
 import useWebSocket from "react-use-websocket";
@@ -17,6 +17,7 @@ import LineChart from "../components/charts/LineChart.jsx";
 import StepButtons from "../components/StepButtons.jsx";
 const Home = () => {
   const [files, setFiles] = useState([]);
+
   const { data } = useQuery({
     queryFn: () => {
       const formData = new FormData();
@@ -25,13 +26,15 @@ const Home = () => {
     },
     queryKey: ['process', ...files.map((file) => file.name)],
     enabled: files != false,
-    refetchOnWindowFocus:false
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
   })
   const imageQuery = useQuery({
     queryFn: () => axios.get('http://localhost:8000/as_image', { params: { transaction_name: data.data?.transaction_name } }),
     queryKey: ['image', data?.data?.transaction_name],
     enabled: data?.status === 200,
-    refetchOnWindowFocus:false
+    refetchOnWindowFocus: false
   })
   const n = 25
   const image = imageQuery.data?.data?.data
@@ -44,64 +47,119 @@ const Home = () => {
     placeholderData: (lastData) => lastData,
   })
   console.log('selectedPi ', selectedPixelQuery)
-  let selectedPixelSeries = useMemo(()=>{
-    if(selectedPixelQuery.data?.data){
+  let selectedPixelSeries = useMemo(() => {
+    if (selectedPixelQuery.data?.data) {
       return [
         {
           label: 'Wavelength refraction index',
-          data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({wavelength: parseFloat(key), refractionIndex: value}))
+          data: Object.entries(selectedPixelQuery.data.data.pixel).map(([key, value]) => ({ wavelength: parseFloat(key), refractionIndex: value }))
         },
       ]
     }
 
     return null
-  },[selectedPixelQuery.isRefetching, selectedPixelQuery.isFetching])
-
+  }, [selectedPixelQuery.isRefetching, selectedPixelQuery.isFetching])
+  const [currentPrediction, setCurrentPrediction] = useState(null);
+  const [selectedModel, setSelectedModel] = useState(1);
+  useEffect(() => {
+    setCurrentPrediction(null);
+    setSelectedModel(1);
+  }
+    , [files]);
+  const getPrediction = useMutation({
+    mutationFn: (model) => {
+      return axios.get('http://localhost:8000/predict', { params: { transaction_name: data.data?.transaction_name, model: selectedModel } })
+    },
+    onSuccess: (data => {
+      console.log('Prediction data', data.data)
+      setCurrentPrediction(data.data.data)
+    }),
+    onError: (error) => {
+      console.error('Error fetching prediction:  ', error);
+    }
+  })
   const getWavelength = item => item.wavelength
   const getRefractionIndex = item => item.refractionIndex
   console.log('series', selectedPixelSeries)
   console.log('selectedPixel', selectedPixel)
+
+
   return (
     <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
 
       <LogoText />
-      <div className="flex flex-col sm:flex-row h-56  w-full items-center sm:justify-center p-4 shrink-0 ">
-        <div className="h-full space-y-1 font-poppins w-1/2 px-4 flex flex-col">
-          <p className="font-light text-center w-full ">Select a .bip and a .hdr file to view hyperspectral information</p>
-          <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} accept='.bip,.hdr,.bil' />
+      <div className="w-full h-full  flex flex-row">
+        <div className="w-full h-full flex flex-col">
+          <div className="flex flex-row sm:flex-row h-56  w-full items-center sm:justify-center p-4 shrink-0 ">
+            <div className="h-full space-y-1 font-poppins w-1/2 px-4 flex flex-col">
+              <p className="font-light text-center w-full ">Select a .bip and a .hdr file to view hyperspectral information</p>
+              <InputFile max={2} onChangeFile={(newFiles) => setFiles(newFiles)} accept='.bip,.hdr,.bil' />
+            </div>
+            {
+              (selectedPixel && selectedPixelSeries) && (
+                (
+                  <LineChart series={selectedPixelSeries} getValueForPrimaryAxis={getWavelength} getValueForSecondaryAxis={getRefractionIndex} />
+                )
+              )
+            }
+          </div>
+          <div className="flex flex-col justify-center items-center bg-white rounded-md drop-shadow-md dark:bg-slate-950 p-2">
+            {
+              data && (
+                (imageQuery.isLoading) ? <Spinner className="w-16 h-16" /> : (
+                  <ImageViewer data={data} image={image} onRenderingStateChange={val => setRenderingImage(val)} onChangeSelectedPixel={newVal => setSelectedPixel(newVal)} />
+                )
+              )
+            }
+          </div>
         </div>
-        {
-          (selectedPixel && selectedPixelSeries) && (
-             (
-              <LineChart series={selectedPixelSeries} getValueForPrimaryAxis={getWavelength} getValueForSecondaryAxis={getRefractionIndex}/>
-            )
-          )
-        }
+        <div className="w-3xl h-full flex  flex-col border-t-2 border-l-2 border-slate-100 p-2">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">CNN hab detection models</h2>
+          <div className="flex flex-col w-full items-center space-y-4">
+            <div className="flex flex-row items-center space-x-4">
+              <InputRadio
+                id={'model'}
+                name={'model'}
+                value={selectedModel}
+                onChange={(value) => setSelectedModel(value)}
+                getId={(option) => option}
+                getName={(option) => {
+                  if (option === 1) return 'Simple one-label';
+                  if (option === 2) return 'Simple multi-label';
+                  if (option === 3) return 'Extradata one-label';
+                }}
+                options={[1, 2, 3]}
+              ></InputRadio>
+
+            </div>
+            {
+              selectedModel === 3 && (
+                <div className="flex flex-col space-y-2 mt-4">
+                  <InputTextArea placeholder="9">Temp° </InputTextArea>
+                  <InputTextArea placeholder="0">Salinidad</InputTextArea>
+                  <InputTextArea placeholder="0">Clo-a </InputTextArea>
+                </div>
+              )
+            }
+            <Button style="primary"
+              className={'w-full'}
+              onClick={() => getPrediction.mutate(selectedModel)}
+            >Predict HAB</Button>
+            {
+              currentPrediction && (
+                <div className="flex flex-col items-center bg-green-100 dark:bg-green-900 rounded-md p-4 mt-4">
+                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-300">Prediction Result</h3>
+                  <p className="text-sm text-green-700 dark:text-green-400">{currentPrediction.model_msg}</p>
+                </div>
+              )
+            }
+          </div>
+
+        </div>
       </div>
-      <div className="flex flex-col justify-center items-center bg-white rounded-md drop-shadow-md dark:bg-slate-950 p-2">
-        {
-          data&&(
-            (imageQuery.isLoading) ? <Spinner className="w-16 h-16" /> : (
-              <ImageViewer data={data} image={image} onRenderingStateChange={val => setRenderingImage(val)} onChangeSelectedPixel={newVal => setSelectedPixel(newVal)} />
-            )
-          )
-        }
-      </div>
-      
-        <div className="flex flex-col w-fit h-fit space-y-1 font-poppins">
-        <h2 className="font-light ">Components library</h2>
-        <InputFile />
-        <Button style="primary">primary</Button>
-        <Button style="secondary">secondary</Button>
-        <Button style="danger">danger</Button>
-        <InputCheckBox>Check me</InputCheckBox>
-        <InputRadio>Radio me</InputRadio>
-        <InputText>Text me</InputText>
-        <InputTextArea>Textarea me</InputTextArea>
-        <Spinner />
-        <StepButtons />
-      </div>
-      
+
+
+
     </div>
   )
 }

@@ -13,7 +13,7 @@ from processing.decode import decode
 import os
 app = FastAPI()
 import tempfile
-
+from models.model_loader import SingleLabelModelLoader
 # Obtener la ruta de la carpeta temporal
 temp_dir = os.path.join(tempfile.gettempdir(), 'hypermantis')
 print(f"La carpeta temporal del sistema es: {temp_dir}")
@@ -40,7 +40,7 @@ async def process_image(files: list[UploadFile] = File(...)):
     transaction_name = str(uuid.uuid4())
     data_file_location = os.path.join(temp_dir, transaction_name+'.bip')  
     header_file_location = os.path.join(temp_dir, transaction_name+'.bip.hdr')  
-
+    
     with open(data_file_location, "wb") as data_f:
         data_f.write(files[0].file.read())
     with open(header_file_location, "wb") as header_f:
@@ -69,6 +69,24 @@ async def get_pixel_info(transaction_name: str, x: int, y: int):
     image = decode(data_filename, header_filename)
     pixel = image.img[y,x]
     return {'message': 'pixel info', 'pixel': zip(image.bands, pixel.tolist())}
+
+
+@app.get("/predict")
+async def predict(transaction_name: str):
+    data_filename = os.path.join(temp_dir, transaction_name+'.bip')
+    header_filename = os.path.join(temp_dir, transaction_name+'.bip.hdr')
+    image = decode(data_filename, header_filename)
+    model = SingleLabelModelLoader()
+    model.load()
+    result = model.predict(image.get_img()[:,:,:])
+    print(f'Result: {result}')
+    data_result = {
+        'model_msg': f'Result: {result}',
+        'probabilities': result,
+        'classes': model.clases,
+    }
+    return {'message':'infered', 'data': data_result,  }
+
 
 if __name__ == "__main__":
     import uvicorn

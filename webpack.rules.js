@@ -1,4 +1,3 @@
-const path = require("path");
 
 module.exports = [
   // Add support for native node modules
@@ -29,17 +28,18 @@ module.exports = [
     },
   },
   {
-    // loads .css files
-    test: /\.css$/,
-    include: [path.resolve(__dirname, "app/src")],
-    use: ["style-loader", "css-loader", "postcss-loader"],
-  },
-  {
     test: /\.svg$/,
     use: ['@svgr/webpack'],
 },
+{
+test: /\.(woff|woff2|eot|ttf|otf)$/i,
+type: 'asset/resource',
+generator: {
+    filename: 'fonts/[name][ext]',
+},
+},
 
-  // Put your webpack loader rules in this array.  This is where you would put
+// Put your webpack loader rules in this array.  This is where you would put
   // your ts-loader configuration for instance:
   /**
    * Typescript Example:

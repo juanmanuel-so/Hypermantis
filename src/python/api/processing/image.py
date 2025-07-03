@@ -30,6 +30,7 @@ class Image:
         positions = [find_closest(self.bands, num) for num in bands_selected]
         print('available wavelength vy positions:', [self.bands[positions[0]], self.bands[positions[1]], self.bands[positions[2]]])
         rgb_image = spy.get_rgb(self.img, positions)
+        #spy.view_cube(self.img, positions)
         return rgb_image
     
     def save_rgb(self, bands_selected=rgb_wavelengths):
