@@ -3,7 +3,7 @@ import numpy as np
 from skimage.transform import resize
 class SingleLabelModelLoader:
     def __init__(self):
-        self.model_name = './models/one_label-1.0.keras'  # hardcodeado
+        self.model_name = './models/one_label-1.1.keras'  # hardcodeado
         self.model = keras.models.load_model(self.model_name)
         self.clases = [
             "Heterocapsa",  # número 0 → índice 0
@@ -11,7 +11,6 @@ class SingleLabelModelLoader:
             "Pseudo-nitzchia",  # número 2 → índice 2
             "Rhizosolenia",    # número 3 → índice 3
             "Skeletonema",      # número 4 → índice 4
-            "BORRAR ESTA"
         ]
 
 
