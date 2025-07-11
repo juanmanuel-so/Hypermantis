@@ -3,13 +3,59 @@ const path = require('node:path');
 const { Menu, ipcMain } = require('electron');
 const { default: getMenu } = require('./utils/getMenu');
 const ContextMenu = require("secure-electron-context-menu").default;
-const fs = require('fs'); 
+const fs = require('fs');
 const os = require('os');
+const isDev = require('electron-is-dev');
+
+const logFilePath = path.join(app.getPath('userData'), 'python-log.txt');
+const logFile = fs.createWriteStream(logFilePath, { flags: 'a' });
+console.log('Guardando log en:', logFilePath);
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
 const isMac = process.platform === 'darwin'
+
+const { spawn } = require('child_process');
+
+let pythonProcess;
+
+app.whenReady().then(() => {
+  let backendPath;
+
+  if (isDev) {
+    // Dev: asumiendo que el exec está en project_root/server_py
+    backendPath = path.join(__dirname, '..', '..', 'server_py',
+      process.platform === 'win32' ? 'server.exe' : 'server'
+    );
+  } else {
+    // Prod: asumiendo que lo empaquetas junto al main.js compilado
+    backendPath = path.join(process.resourcesPath, 'resources',
+      process.platform === 'win32' ? 'server.exe' : 'server'
+    );
+  }
+  pythonProcess = spawn(backendPath, []);
+
+  pythonProcess.stdout.on('data', (data) => {
+    const text = data.toString();
+    console.log(`PYTHON: ${text}`);
+    logFile.write(`PYTHON: ${text}`);
+  });
+
+  pythonProcess.stderr.on('data', (data) => {
+    const text = data.toString();
+    console.error(`PYTHON ERROR: ${text}`);
+    logFile.write(`PYTHON ERROR: ${text}`);
+  });
+
+  pythonProcess.on('close', (code) => {
+    logFile.write(`PYTHON CLOSED with code ${code}\n`);
+  });
+});
+
+app.on('before-quit', () => {
+  if (pythonProcess) pythonProcess.kill();
+});
 
 const tempDir = path.join(os.tmpdir(), 'hypermantis');
 const createWindow = () => {

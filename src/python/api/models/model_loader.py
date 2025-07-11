@@ -1,9 +1,15 @@
 from tensorflow import keras
 import numpy as np
 from skimage.transform import resize
+import os
+basedir = os.path.dirname(os.path.abspath(__file__))
+
+model_path1 = os.path.join(basedir,'one_label-1.2.keras')
+model_path2 = os.path.join(basedir, 'multilabel-1.3.keras')
+model_path3 = os.path.join(basedir, 'extradata-1.1.keras')
 class SingleLabelModelLoader:
     def __init__(self):
-        self.model_name = './models/one_label-1.2.keras'  # hardcodeado
+        self.model_name = model_path1 # hardcodeado
         self.model = keras.models.load_model(self.model_name)
         self.clases = [
             "Heterocapsa",  # número 0 → índice 0
@@ -59,7 +65,7 @@ class SingleLabelModelLoader:
 
 class MultiLabelModelLoader:
     def __init__(self):
-        self.model_name = './models/multilabel-1.3.keras'  # hardcodeado
+        self.model_name = model_path2 # hardcodeado
         self.model = keras.models.load_model(self.model_name)
         self.clases = [
             "Chaetoceros",  # número 0 → índice 0
@@ -112,7 +118,7 @@ class MultiLabelModelLoader:
         return result
 class ExtradataModelLoader:
     def __init__(self, mtd_tensor):
-        self.model_name = './models/extradata-1.1.keras'  # hardcodeado
+        self.model_name = model_path3
         self.model = keras.models.load_model(self.model_name)
         self.mtd_tensor = mtd_tensor  # Tensor de metadatos
         self.clases = [
