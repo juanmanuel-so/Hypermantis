@@ -13,7 +13,7 @@ from processing.decode import decode
 import os
 app = FastAPI()
 import tempfile
-from models.model_loader import SingleLabelModelLoader, MultiLabelModelLoader
+from models.model_loader import SingleLabelModelLoader, MultiLabelModelLoader, ExtradataModelLoader
 # Obtener la ruta de la carpeta temporal
 temp_dir = os.path.join(tempfile.gettempdir(), 'hypermantis')
 print(f"La carpeta temporal del sistema es: {temp_dir}")
@@ -72,7 +72,7 @@ async def get_pixel_info(transaction_name: str, x: int, y: int):
 
 
 @app.get("/predict")
-async def predict(transaction_name: str, model: int):
+async def predict(transaction_name: str, model: int, mtd1: float, mtd2: float, mtd3: float):
     data_filename = os.path.join(temp_dir, transaction_name+'.bip')
     header_filename = os.path.join(temp_dir, transaction_name+'.bip.hdr')
     image = decode(data_filename, header_filename)
@@ -80,6 +80,8 @@ async def predict(transaction_name: str, model: int):
         model = SingleLabelModelLoader()
     elif model == 2:
         model = MultiLabelModelLoader()
+    elif model == 3:
+        model = ExtradataModelLoader((mtd1, mtd2, mtd3))
     else:
         return JSONResponse({'message': 'Invalid model selection'}, status_code=400)
     model.load()

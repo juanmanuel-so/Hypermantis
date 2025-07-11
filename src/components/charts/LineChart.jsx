@@ -30,7 +30,6 @@ export default function LineChart({series, getValueForPrimaryAxis, getValueForSe
             secondaryAxes,
             dark: theme === 'dark'
           }}
-
         />
     </div>
   );

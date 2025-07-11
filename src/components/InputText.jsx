@@ -1,6 +1,6 @@
 import React from 'react'
 
-const InputText = ({ className, children, placeholder}) => {
+const InputText = ({ className, children, placeholder, value, onChange}) => {
   return (
     <label className={'w-full px-1 py-0.5 ' + ' ' + className}>
       <p className=''>
@@ -8,6 +8,8 @@ const InputText = ({ className, children, placeholder}) => {
       </p>
       <input
         placeholder={placeholder}
+        value={value}
+        onChange={onChange}
         className='w-full outline-green-600 border border-slate-300 focus:outline-0 focus:ring-1 ring-green-600 rounded-md px-1.5 py-1 font-light text-sm dark:bg-slate-800 dark:border-slate-700 drop-shadow-md'
       />
     </label>

@@ -69,9 +69,12 @@ const Home = () => {
     setSelectedModel(1);
   }
     , [files]);
+  const [mtd1, setMtd1] = useState(0);
+  const [mtd2, setMtd2] = useState(0);
+  const [mtd3, setMtd3] = useState(0);
   const getPrediction = useMutation({
     mutationFn: (model) => {
-      return axios.get('http://localhost:8000/predict', { params: { transaction_name: data.data?.transaction_name, model: selectedModel } })
+      return axios.get('http://localhost:8000/predict', { params: { transaction_name: data.data?.transaction_name, model: selectedModel, mtd1: mtd1, mtd2: mtd2, mtd3:mtd3 } })
     },
     onSuccess: (data => {
       console.log('Prediction data', data.data)
@@ -87,6 +90,7 @@ const Home = () => {
   console.log('selectedPixel', selectedPixel)
   console.log('selectedmodel', selectedModel)
   console.log('current prediction', currentPrediction)
+
   return (
     <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
 
@@ -138,9 +142,9 @@ const Home = () => {
             {
               selectedModel === 3 && (
                 <div className="flex flex-col space-y-2 mt-4">
-                  <InputTextArea placeholder="9">Temp° </InputTextArea>
-                  <InputTextArea placeholder="0">Salinidad</InputTextArea>
-                  <InputTextArea placeholder="0">Clo-a </InputTextArea>
+                  <InputText placeholder="9" value={mtd1} onChange={(e) => setMtd1(e.target.value)}>Temp° </InputText>
+                  <InputText placeholder="0" value={mtd2} onChange={(e) => setMtd2(e.target.value)}>Salinidad</InputText>
+                  <InputText placeholder="0" value={mtd3} onChange={(e) => setMtd3(e.target.value)}>Clo-a </InputText>
                 </div>
               )
             }
