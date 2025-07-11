@@ -15,6 +15,9 @@ import ImageViewer from "../components/ImageViewer.jsx";
 import Spinner from "../components/Spinner.jsx";
 import LineChart from "../components/charts/LineChart.jsx";
 import StepButtons from "../components/StepButtons.jsx";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+ChartJS.register(ArcElement, Tooltip, Legend);
 const Home = () => {
   const [files, setFiles] = useState([]);
 
@@ -82,8 +85,8 @@ const Home = () => {
   const getRefractionIndex = item => item.refractionIndex
   console.log('series', selectedPixelSeries)
   console.log('selectedPixel', selectedPixel)
-
-
+  console.log('selectedmodel', selectedModel)
+  console.log('current prediction', currentPrediction)
   return (
     <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
 
@@ -150,9 +153,31 @@ const Home = () => {
                 <div className="flex flex-col items-center bg-green-100 dark:bg-green-900 rounded-md p-4 mt-4">
                   <h3 className="text-lg font-semibold text-green-800 dark:text-green-300">Prediction Result</h3>
                   <p className="text-sm text-green-700 dark:text-green-400">{currentPrediction.model_msg}</p>
+                  <Pie
+
+                    data={
+                      {
+                        labels: currentPrediction.classes,
+                        datasets: [
+                          {
+                            label: 'Probability',
+                            data: currentPrediction.probabilities,
+                            backgroundColor: [
+                              '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF',
+                              '#33FFF5', '#F5FF33', '#FF8C33', '#8CFF33', '#338CFF',
+                              '#FF3333', '#33FF33', '#3333FF', '#FF33FF', '#33FFFF',
+                              '#FFFF33', '#FF6633', '#66FF33', '#3366FF', '#FF3366'
+                            ],
+                            borderWidth: 1,
+                          },
+                        ],
+                      }
+                    }
+                  />
                 </div>
               )
             }
+
           </div>
 
         </div>

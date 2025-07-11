@@ -13,7 +13,7 @@ from processing.decode import decode
 import os
 app = FastAPI()
 import tempfile
-from models.model_loader import SingleLabelModelLoader
+from models.model_loader import SingleLabelModelLoader, MultiLabelModelLoader
 # Obtener la ruta de la carpeta temporal
 temp_dir = os.path.join(tempfile.gettempdir(), 'hypermantis')
 print(f"La carpeta temporal del sistema es: {temp_dir}")
@@ -72,20 +72,27 @@ async def get_pixel_info(transaction_name: str, x: int, y: int):
 
 
 @app.get("/predict")
-async def predict(transaction_name: str):
+async def predict(transaction_name: str, model: int):
     data_filename = os.path.join(temp_dir, transaction_name+'.bip')
     header_filename = os.path.join(temp_dir, transaction_name+'.bip.hdr')
     image = decode(data_filename, header_filename)
-    model = SingleLabelModelLoader()
+    if model == 1:
+        model = SingleLabelModelLoader()
+    elif model == 2:
+        model = MultiLabelModelLoader()
+    else:
+        return JSONResponse({'message': 'Invalid model selection'}, status_code=400)
     model.load()
     result = model.predict(image.get_img()[:,:,:])
-    print(f'Result: {result}')
-    data_result = {
-        'model_msg': f'Result: {result}',
-        'probabilities': result,
-        'classes': model.clases,
-    }
-    return {'message':'infered', 'data': data_result,  }
+    print(f'Result: {result['model_msg']}')
+    
+    return {'message':'infered', 'data': {
+        'model_msg': result['model_msg'],
+        'literal_result': result['literal_result'],
+        'probabilities': result['probabilities'].tolist()[0],
+        'classes': result['classes']
+    }}
+
 
 
 if __name__ == "__main__":
