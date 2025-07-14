@@ -1,5 +1,5 @@
 import React, { createContext, useEffect } from "react";
-import Home from "./views/home.jsx";
+import Home from "./views/Home.jsx";
 import Tabs from "./components/Tabs.jsx";
 import useTabs from "./hooks/useTabs.js";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -21,7 +21,9 @@ export default function App() {
       <AppContextProvider value={{ theme, setTheme }}>
         <QueryClientProvider client={queryClient}>
 
-          <Tabs
+        {
+          /*
+            <Tabs
             onSelectTab={setCurrentTabIndex}
             onAddTab={addTab}
             onRemoveTab={removeTab}
@@ -29,6 +31,8 @@ export default function App() {
             currentTabIndex={currentTabIndex}
             tabs={tabs}
           />
+          */
+        }
 
           <Home currentTabInformation={currentTab} className="font-bold " />
         </QueryClientProvider>

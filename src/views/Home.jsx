@@ -20,6 +20,12 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 const Home = () => {
   const [files, setFiles] = useState([]);
+  const serverStatusQuery = useQuery({
+    queryFn: () => axios.get('http://localhost:8000/'),
+    queryKey: ['server_status'],
+    retry: true,
+    retryDelay: 50,
+  })
 
   const { data } = useQuery({
     queryFn: () => {
@@ -74,7 +80,7 @@ const Home = () => {
   const [mtd3, setMtd3] = useState(0);
   const getPrediction = useMutation({
     mutationFn: (model) => {
-      return axios.get('http://localhost:8000/predict', { params: { transaction_name: data.data?.transaction_name, model: selectedModel, mtd1: mtd1, mtd2: mtd2, mtd3:mtd3 } })
+      return axios.get('http://localhost:8000/predict', { params: { transaction_name: data.data?.transaction_name, model: selectedModel, mtd1: mtd1, mtd2: mtd2, mtd3: mtd3 } })
     },
     onSuccess: (data => {
       console.log('Prediction data', data.data)
@@ -86,17 +92,22 @@ const Home = () => {
   })
   const getWavelength = item => item.wavelength
   const getRefractionIndex = item => item.refractionIndex
-  console.log('series', selectedPixelSeries)
-  console.log('selectedPixel', selectedPixel)
+
+  console.log('current sv status', serverStatusQuery)
   console.log('selectedmodel', selectedModel)
-  console.log('current prediction', currentPrediction)
+  if (!serverStatusQuery.isFetched) return (
+    <div className="w-full h-full flex justify-center items-center flex-col bg-gray-50  dark:bg-slate-900 rounded border border-slate-100">
+      <Spinner className="w-16 h-16" />
+      <h1 className="text-xl text-green-800 dark:text-green-300">Waiting python server to connect...</h1>
+    </div>
+  )
 
   return (
-    <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-full h-full overflow-y-auto flex flex-col justify-stretch items-center space-y-4">
+    <div cm-template="default" className=" text-slate-900 dark:text-slate-100 w-screen h-screen flex flex-col justify-stretch items-center space-y-4">
 
       <LogoText />
-      <div className="w-full h-full  flex flex-row">
-        <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full max-h-fit  flex flex-row">
+        <div className="w-full h-full  max-h-fit flex flex-col overflow-y-auto py-10">
           <div className="flex flex-row sm:flex-row h-56  w-full items-center sm:justify-center p-4 shrink-0 ">
             <div className="h-full space-y-1 font-poppins w-1/2 px-4 flex flex-col">
               <p className="font-light text-center w-full ">Select a .bip and a .hdr file to view hyperspectral information</p>
@@ -120,71 +131,77 @@ const Home = () => {
             }
           </div>
         </div>
-        <div className="w-3xl h-full flex  flex-col border-t-2 border-l-2 border-slate-100 p-2">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">CNN hab detection models</h2>
-          <div className="flex flex-col w-full items-center space-y-4">
-            <div className="flex flex-row items-center space-x-4">
-              <InputRadio
-                id={'model'}
-                name={'model'}
-                value={selectedModel}
-                onChange={(value) => setSelectedModel(value)}
-                getId={(option) => option}
-                getName={(option) => {
-                  if (option === 1) return 'Simple one-label';
-                  if (option === 2) return 'Simple multi-label';
-                  if (option === 3) return 'Extradata one-label';
-                }}
-                options={[1, 2, 3]}
-              ></InputRadio>
+        {
+          data && (
+            <div className="w-3xl min-w-fit h-full flex rounded-md flex-col border-l border-slate-100 dark:border-slate-800  p-2">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">CNN hab detection models</h2>
+              <div className="flex flex-col w-full items-center space-y-4">
+                <div className="flex flex-row items-center space-x-4">
+                  <InputRadio
+                    id={'model'}
+                    name={'model'}
+                    value={selectedModel}
+                    onChange={(value) => setSelectedModel(value)}
+                    getId={(option) => option}
+                    getName={(option) => {
+                      if (option === 1) return 'Simple one-label';
+                      if (option === 2) return 'Simple multi-label';
+                      if (option === 3) return 'Extradata one-label';
+                    }}
+
+                    options={[1, 2, 3]}
+                  ></InputRadio>
+
+                </div>
+                {
+                  selectedModel === 3 && (
+                    <div className="flex flex-col space-y-2 mt-4">
+                      <InputText placeholder="9" value={mtd1} onChange={(e) => setMtd1(e.target.value)}>Temp° </InputText>
+                      <InputText placeholder="0" value={mtd2} onChange={(e) => setMtd2(e.target.value)}>Salinidad</InputText>
+                      <InputText placeholder="0" value={mtd3} onChange={(e) => setMtd3(e.target.value)}>Clo-a </InputText>
+                    </div>
+                  )
+                }
+                <Button style="primary"
+                  className={'w-full'}
+                  onClick={() => getPrediction.mutate(selectedModel)}
+                >Predict HAB</Button>
+                {
+                  currentPrediction && (
+                    <div className="flex flex-col items-center bg-slate-200 border border-green-100 shadow  rounded-md p-4 mt-4">
+                      <h3 className="text-lg font-semibold text-green-800">Prediction Result</h3>
+                      <p className="text-sm text-slate-900">{currentPrediction.model_msg}</p>
+                      <Pie
+
+                        data={
+                          {
+                            labels: currentPrediction.classes,
+                            datasets: [
+                              {
+                                label: 'Probability',
+                                data: currentPrediction.probabilities,
+                                backgroundColor: [
+                                  '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF',
+                                  '#33FFF5', '#F5FF33', '#FF8C33', '#8CFF33', '#338CFF',
+                                  '#FF3333', '#33FF33', '#3333FF', '#FF33FF', '#33FFFF',
+                                  '#FFFF33', '#FF6633', '#66FF33', '#3366FF', '#FF3366'
+                                ],
+                                borderWidth: 1,
+
+                              },
+                            ],
+                          }
+                        }
+                      />
+                    </div>
+                  )
+                }
+
+              </div>
 
             </div>
-            {
-              selectedModel === 3 && (
-                <div className="flex flex-col space-y-2 mt-4">
-                  <InputText placeholder="9" value={mtd1} onChange={(e) => setMtd1(e.target.value)}>Temp° </InputText>
-                  <InputText placeholder="0" value={mtd2} onChange={(e) => setMtd2(e.target.value)}>Salinidad</InputText>
-                  <InputText placeholder="0" value={mtd3} onChange={(e) => setMtd3(e.target.value)}>Clo-a </InputText>
-                </div>
-              )
-            }
-            <Button style="primary"
-              className={'w-full'}
-              onClick={() => getPrediction.mutate(selectedModel)}
-            >Predict HAB</Button>
-            {
-              currentPrediction && (
-                <div className="flex flex-col items-center bg-green-100 dark:bg-green-900 rounded-md p-4 mt-4">
-                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-300">Prediction Result</h3>
-                  <p className="text-sm text-green-700 dark:text-green-400">{currentPrediction.model_msg}</p>
-                  <Pie
-
-                    data={
-                      {
-                        labels: currentPrediction.classes,
-                        datasets: [
-                          {
-                            label: 'Probability',
-                            data: currentPrediction.probabilities,
-                            backgroundColor: [
-                              '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF',
-                              '#33FFF5', '#F5FF33', '#FF8C33', '#8CFF33', '#338CFF',
-                              '#FF3333', '#33FF33', '#3333FF', '#FF33FF', '#33FFFF',
-                              '#FFFF33', '#FF6633', '#66FF33', '#3366FF', '#FF3366'
-                            ],
-                            borderWidth: 1,
-                          },
-                        ],
-                      }
-                    }
-                  />
-                </div>
-              )
-            }
-
-          </div>
-
-        </div>
+          )
+        }
       </div>
 
 

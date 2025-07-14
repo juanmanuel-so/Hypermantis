@@ -41,11 +41,14 @@ async def process_image(files: list[UploadFile] = File(...)):
     data_file_location = os.path.join(temp_dir, transaction_name+'.bip')  
     header_file_location = os.path.join(temp_dir, transaction_name+'.bip.hdr')  
     
-    with open(data_file_location, "wb") as data_f:
-        data_f.write(files[0].file.read())
-    with open(header_file_location, "wb") as header_f:
-        header_f.write(files[1].file.read())
-
+    for f in files:
+        contents = await f.read()
+        if f.filename.lower().endswith(".hdr"):
+            with open(header_file_location, "wb") as header_f:
+                header_f.write(contents)
+        else:
+            with open(data_file_location, "wb") as data_f:
+                data_f.write(contents)
     result = {
         'message': 'Image processed successfully',
         'transaction_name': transaction_name,

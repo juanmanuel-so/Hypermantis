@@ -1,28 +1,0 @@
-PYTHON ERROR: INFO:     Started server process [9801]
-INFO:     Waiting for application startup.
-PYTHON ERROR: INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-PYTHON: La carpeta temporal del sistema es: /var/folders/g3/636_5n492f7dkyqqq8rrm7880000gn/T/hypermantis
-Start file processing
-INFO:     127.0.0.1:58818 - "POST /process HTTP/1.1" 200 OK
-PYTHON: available wavelength vy positions: ['631.05', '532.76', '464.86']
-INFO:     127.0.0.1:58818 - "GET /as_image?transaction_name=8f8b4f39-ec3a-415f-9190-762790bbf160 HTTP/1.1" 200 OK
-PYTHON: Modelo "/var/folders/g3/636_5n492f7dkyqqq8rrm7880000gn/T/_MEIbs2KLc/models/one_label-1.2.keras" cargado correctamente.
-Forma redimensionada: (512, 512, 236)
-[1m1/1[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 195ms/stepPYTHON: [1m1/1[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 201ms/step
-PYTHON: Clase predicha: 4
-Clase string predicha: Skeletonema
-Predicciones: [[0.00608783 0.18699272 0.2742763  0.0080318  0.52461135]]
-Result: Result: Skeletonema
-INFO:     127.0.0.1:58818 - "GET /predict?transaction_name=8f8b4f39-ec3a-415f-9190-762790bbf160&model=1&mtd1=0&mtd2=0&mtd3=0 HTTP/1.1" 200 OK
-PYTHON: Modelo "/var/folders/g3/636_5n492f7dkyqqq8rrm7880000gn/T/_MEIbs2KLc/models/multilabel-1.3.keras" cargado correctamente.
-Forma redimensionada: (512, 512, 236)
-[1m1/1[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 165ms/stepPYTHON: [1m1/1[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 171ms/step
-PYTHON: Predicciones: [[1.0071222e-03 1.9120640e-01 9.1897583e-08 3.0936515e-02 1.3828842e-03
-  7.5571799e-01 3.0838919e-01]]
-Clases predichas: [5]
-Clases string predichas: ['Rhizosolenia']
-Predicciones: [[1.0071222e-03 1.9120640e-01 9.1897583e-08 3.0936515e-02 1.3828842e-03
-  7.5571799e-01 3.0838919e-01]]
-Result: Result: ['Rhizosolenia']
-INFO:     127.0.0.1:58828 - "GET /predict?transaction_name=8f8b4f39-ec3a-415f-9190-762790bbf160&model=2&mtd1=0&mtd2=0&mtd3=0 HTTP/1.1" 200 OK

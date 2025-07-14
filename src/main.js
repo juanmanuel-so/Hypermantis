@@ -5,56 +5,79 @@ const { default: getMenu } = require('./utils/getMenu');
 const ContextMenu = require("secure-electron-context-menu").default;
 const fs = require('fs');
 const os = require('os');
-const isDev = require('electron-is-dev');
+
 
 const logFilePath = path.join(app.getPath('userData'), 'python-log.txt');
+fs.writeFileSync(logFilePath, '=== NUEVO LOG ===\n', 'utf-8');
 const logFile = fs.createWriteStream(logFilePath, { flags: 'a' });
 console.log('Guardando log en:', logFilePath);
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
-const isMac = process.platform === 'darwin'
-
 const { spawn } = require('child_process');
+
+
+logFile.write(`Iniciando app. Platform: ${process.platform}\n`);
+logFile.write(`process.resourcesPath: ${process.resourcesPath}\n`);
+
+
+const isMac = process.platform === 'darwin'
 
 let pythonProcess;
 
+
 app.whenReady().then(() => {
   let backendPath;
-
+  const exeName = process.platform === 'win32' ? 'server.exe' : 'server';
+  const isDev = !app.isPackaged;
+  logFile.write(`Dev? ${isDev}\n`);
   if (isDev) {
-    // Dev: asumiendo que el exec está en project_root/server_py
-    backendPath = path.join(__dirname, '..', '..', 'server_py',
-      process.platform === 'win32' ? 'server.exe' : 'server'
-    );
+    backendPath = path.join(__dirname, '..', '..', 'server_py', exeName);
   } else {
-    // Prod: asumiendo que lo empaquetas junto al main.js compilado
-    backendPath = path.join(process.resourcesPath, 'resources',
-      process.platform === 'win32' ? 'server.exe' : 'server'
-    );
+    backendPath = path.join(process.resourcesPath, exeName);
   }
-  pythonProcess = spawn(backendPath, []);
 
-  pythonProcess.stdout.on('data', (data) => {
-    const text = data.toString();
-    console.log(`PYTHON: ${text}`);
-    logFile.write(`PYTHON: ${text}`);
-  });
+  logFile.write(`Intentando iniciar backend desde: ${backendPath}\n`);
 
-  pythonProcess.stderr.on('data', (data) => {
-    const text = data.toString();
-    console.error(`PYTHON ERROR: ${text}`);
-    logFile.write(`PYTHON ERROR: ${text}`);
-  });
+  // Verifica si el archivo realmente existe
+  if (fs.existsSync(backendPath)) {
+    logFile.write(`El backend existe en la ruta indicada.\n`);
+  } else {
+    logFile.write(`⚠️ El backend NO existe en la ruta indicada.\n`);
+  }
 
-  pythonProcess.on('close', (code) => {
-    logFile.write(`PYTHON CLOSED with code ${code}\n`);
-  });
+  try {
+    pythonProcess = spawn(backendPath, []);
+
+    pythonProcess.stdout.on('data', (data) => {
+      const text = data.toString();
+      console.log(`PYTHON: ${text}`);
+      logFile.write(`PYTHON: ${text}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      const text = data.toString();
+      console.error(`PYTHON ERROR: ${text}`);
+      logFile.write(`PYTHON ERROR: ${text}`);
+    });
+
+    pythonProcess.on('close', (code) => {
+      logFile.write(`PYTHON CLOSED with code ${code}\n`);
+    });
+
+    pythonProcess.on('error', (err) => {
+      logFile.write(`PYTHON PROCESS ERROR: ${err.toString()}\n`);
+    });
+
+  } catch (err) {
+    logFile.write(`EXCEPCIÓN lanzada al spawn: ${err.toString()}\n`);
+  }
 });
 
 app.on('before-quit', () => {
   if (pythonProcess) pythonProcess.kill();
+  logFile.write(`api cerrada\n`);
 });
 
 const tempDir = path.join(os.tmpdir(), 'hypermantis');
@@ -146,6 +169,8 @@ app.whenReady().then(() => {
         fs.unlinkSync(filePath);
       }
     }
+    if (pythonProcess) pythonProcess.kill();
+    logFile.write(`api cerrada\n`);
   })
 });
 
@@ -156,6 +181,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+  if (pythonProcess) pythonProcess.kill();
+  logFile.write(`api cerrada\n`);
 });
 
 // In this file you can include the rest of your app's specific main process

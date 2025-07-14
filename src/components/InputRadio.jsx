@@ -21,7 +21,7 @@ const InputRadio = ({ className, id, name, value, onChange, options = defaultOpt
               type="radio"
               id={getId(option)}
               name={componentName}
-              value={!console.log('val', value)&&value}
+              value={value===getId(option)}
               onChange={()=>onChange(getId(option))}
             />
             <svg

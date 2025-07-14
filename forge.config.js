@@ -1,18 +1,11 @@
-const { FusesPlugin } = require('@electron-forge/plugin-fuses');
-const { FuseV1Options, FuseVersion } = require('@electron/fuses');
-
 module.exports = {
   packagerConfig: {
     asar: true,
     icon: './src/assets/icon',
+    extraResource: [
+      "server_py/server",
+    ]
   },
-  extraResources: [
-    {
-      "from": "server_py/server",
-      "to": "resourcers/server"
-    }
-  ]
-  ,
   rebuildConfig: {},
   makers: [
     {
@@ -25,11 +18,7 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {
-        options: {
-          icon: '/path/to/icon.png'
-        }
-      }
+      config: {},
     },
     {
       name: '@electron-forge/maker-rpm',
@@ -37,7 +26,6 @@ module.exports = {
     },
   ],
   plugins: [
-
     {
       name: '@electron-forge/plugin-webpack',
       config: {
@@ -58,8 +46,5 @@ module.exports = {
         },
       },
     },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
-
   ],
 };
