@@ -4,8 +4,8 @@ from skimage.transform import resize
 import os
 basedir = os.path.dirname(os.path.abspath(__file__))
 
-model_path1 = os.path.join(basedir,'one_label-1.2.keras')
-model_path2 = os.path.join(basedir, 'multilabel-1.3.keras')
+model_path1 = os.path.join(basedir,'one_label-2.2.keras')
+model_path2 = os.path.join(basedir, 'multilabel-2.1.keras')
 model_path3 = os.path.join(basedir, 'extradata-1.1.keras')
 class SingleLabelModelLoader:
     def __init__(self):
