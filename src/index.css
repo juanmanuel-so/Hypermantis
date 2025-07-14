@@ -225,6 +225,18 @@
   font-weight: 100;
   font-style: italic;
 }
-body {
-  font-family: 'MyFont', sans-serif;
+
+
+.draggable-element {
+  -webkit-app-region: drag;
+  
+
+}
+.remove-scrollbar::-webkit-scrollbar {
+ /* Para ocultar el scroll en navegadores WebKit */
+  display: none;
+  
+}
+.not-draggable-element {
+  -webkit-app-region: no-drag;
 }

@@ -6,7 +6,7 @@ const InputCheckBox = ({ className, children, id, name, value, onChange }) => {
   const componentId = id ?? defaultId
   return (
     <label className={'flex justify-start items-center space-x-1 font-light hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md ' + ' ' + className}>
-      <div className='flex rounded-lg  '>
+      <div className='flex rounded-lg  relative'>
         <input
           className='relative peer shrink-0 appearance-none w-5 h-5 text-slate-200 rounded-md bg-slate-100 checked:bg-green-600 checked:border-emerald-600 border border-slate-400 drop-shadow-md focus:ring-1 ring-green-500'
           type="checkbox"
