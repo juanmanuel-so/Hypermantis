@@ -98,7 +98,9 @@ const Home = () => {
   if (!serverStatusQuery.isFetched) return (
     <div className="w-full h-full flex justify-center items-center flex-col bg-gray-50  dark:bg-slate-900 rounded border border-slate-100">
       <Spinner className="w-16 h-16" />
-      <h1 className="text-xl text-green-800 dark:text-green-300">Waiting python server to connect...</h1>
+      <h2 className="text-xl font-light text-green-800 dark:text-green-300">Loading python server.</h2>
+      <p className="text-md font-extralight text-slate-900 dark:text-slate-100">This could take a few minutes...</p>
+
     </div>
   )
 
@@ -132,7 +134,7 @@ const Home = () => {
           </div>
         </div>
         {
-          data && (
+          (data && !imageQuery.isLoading) && (
             <div className="w-3xl min-w-fit h-full flex rounded-md flex-col border-l border-slate-100 dark:border-slate-800  p-2">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">CNN hab detection models</h2>
               <div className="flex flex-col w-full items-center space-y-4">
@@ -169,30 +171,42 @@ const Home = () => {
                 {
                   currentPrediction && (
                     <div className="flex flex-col items-center bg-slate-200 border border-green-100 shadow  rounded-md p-4 mt-4">
-                      <h3 className="text-lg font-semibold text-green-800">Prediction Result</h3>
-                      <p className="text-sm text-slate-900">{currentPrediction.model_msg}</p>
-                      <Pie
+                      {
+                        getPrediction.isPending ? (
+                          <div className="flex flex-col items-center space-y-2">
+                            <Spinner className="w-16 h-16" />
+                            <p className="text-sm font-light text-green-800">Processing...</p>
+                          </div>
+                        ) : (
+                          <>
 
-                        data={
-                          {
-                            labels: currentPrediction.classes,
-                            datasets: [
-                              {
-                                label: 'Probability',
-                                data: currentPrediction.probabilities,
-                                backgroundColor: [
-                                  '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF',
-                                  '#33FFF5', '#F5FF33', '#FF8C33', '#8CFF33', '#338CFF',
-                                  '#FF3333', '#33FF33', '#3333FF', '#FF33FF', '#33FFFF',
-                                  '#FFFF33', '#FF6633', '#66FF33', '#3366FF', '#FF3366'
-                                ],
-                                borderWidth: 1,
+                            <h3 className="text-lg font-semibold text-green-800">Prediction Result</h3>
+                            <p className="text-sm text-slate-900">{currentPrediction.model_msg}</p>
+                            <Pie
 
-                              },
-                            ],
-                          }
-                        }
-                      />
+                              data={
+                                {
+                                  labels: currentPrediction.classes,
+                                  datasets: [
+                                    {
+                                      label: 'Probability',
+                                      data: currentPrediction.probabilities,
+                                      backgroundColor: [
+                                        '#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF',
+                                        '#33FFF5', '#F5FF33', '#FF8C33', '#8CFF33', '#338CFF',
+                                        '#FF3333', '#33FF33', '#3333FF', '#FF33FF', '#33FFFF',
+                                        '#FFFF33', '#FF6633', '#66FF33', '#3366FF', '#FF3366'
+                                      ],
+                                      borderWidth: 1,
+
+                                    },
+                                  ],
+                                }
+                              }
+                            />
+                          </>
+                        )
+                      }
                     </div>
                   )
                 }
@@ -202,11 +216,11 @@ const Home = () => {
             </div>
           )
         }
-      </div>
+      </div >
 
 
 
-    </div>
+    </div >
   )
 }
 export default Home
